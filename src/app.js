@@ -7,11 +7,13 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middlewares globaux
-// Configuration explicite de CORS pour autoriser la Vitrine et le Dashboard
+// Configuration explicite de CORS pour autoriser la Vitrine, le Dashboard local, Netlify et le nouveau Site Vitrine
 app.use(cors({
   origin: [
-    'http://localhost:3000', // Port de ton site vitrine
-    'http://localhost:5173'  // Port de ton Dashboard Administrateur Vite
+    'http://localhost:3000',                            // Port du site vitrine local
+    'http://localhost:5173',                            // Port du Dashboard Administrateur local
+    'https://espace-admin-explo-griocole.netlify.app',   //  Le Dashboard Administrateur en ligne sur Netlify
+    'https://prestige-agricole.netlify.app'             // Le Site Vitrine en ligne sur Netlify
   ],
   credentials: true
 }));
