@@ -1,0 +1,76 @@
+datasource db {
+  provider = "postgresql"
+
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// 1. Gestion des Utilisateurs (Exploitants / Agronomes)
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  username  String   @unique
+  password  String   // Mot de passe haché pour la sécurité
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  posts     Post[]   // Un exploitant peut rédiger plusieurs rapports/notes
+}
+
+// 2. Les Notes de Culture / Rapports Techniques (Articles)
+model Post {
+  id          String    @id @default(uuid())
+  title       String    // Titre de la note (ex: "Suivi de la fertilisation - Parcelle Calina IPB9")
+  content     String    // Contenu technique détaillé ou compte-rendu
+  published   Boolean   @default(false) // false = Brouillon/Rapport interne, true = Publié en ligne
+  category    Category  @default(GENERAL) // Catégorie agricole
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  authorId    String
+  author      User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  comments    Comment[] // Un rapport peut susciter des discussions/questions
+}
+
+// 3. L'Espace d'Échange et Commentaires Professionnels
+model Comment {
+  id        String   @id @default(uuid())
+  authorName String  // Nom du visiteur / partenaire / acheteur
+  email     String   // Email requis pour soumettre un commentaire (suivi pro)
+  content   String   // Le message ou la question technique
+  createdAt DateTime @default(now())
+  postId    String
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+}
+
+// Énumération pour catégoriser les publications agricoles
+enum Category {
+  GENERAL
+  SUIVI_PARCELLE      // Suivi de croissance, état du sol
+  PHYTOSANITAIRE      // Traitements, prévention des maladies
+  IRRIGATION          // Gestion de l'eau
+  RECOLTE_RENDEMENT   // Données sur les récoltes et bilans
+  AGROBUSINESS        // Analyses de marché, logistique, investissements
+}
+
+
+// 4. Gestion des Intrants et Matériels (Inventaire)
+model Stock {
+  id          String      @id @default(uuid())
+  name        String      // Nom de l'article (ex: "Semences Calina IPB9", "Engrais NPK")
+  quantity    Float       // Quantité actuelle en stock
+  unit        String      // Unité de mesure (ex: "kg", "litres", "unités", "sacs")
+  minQuantity Float       @default(0) // Seuil d'alerte critique pour le réapprovisionnement
+  category    StockType   @default(AUTRE) // Type d'intrant
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
+
+enum StockType {
+  SEMENCE
+  ENGRAIS
+  PHYTOSANITAIRE
+  IRRIGATION
+  OUTILLAGE
+  AUTRE
+}
