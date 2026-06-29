@@ -55,3 +55,19 @@ exports.deleteComment = async (req, res) => {
     res.status(500).json({ error: "Erreur lors de la suppression : " + error.message });
   }
 };
+
+// 3. Récupérer les commentaires d'une note (Public - Pour la vitrine)
+exports.getCommentsByPost = async (req, res) => {
+  try {
+    const { id } = req.params; // L'ID du post passe par l'URL (:id/comments)
+
+    const comments = await prisma.comment.findMany({
+      where: { postId: id },
+      orderBy: { createdAt: 'asc' } // Les plus anciens d'abord pour suivre le fil de discussion
+    });
+
+    res.json(comments);
+  } catch (error) {
+    res.status(500).json({ error: "Erreur lors de la récupération des commentaires : " + error.message });
+  }
+};
