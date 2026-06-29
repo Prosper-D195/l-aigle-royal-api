@@ -47,7 +47,7 @@ exports.getPostById = async (req, res) => {
   }
 };
 
-// 3. Créer un article (Sécurisé)
+// 3. Créer un article (Sécurisé - Publication directe forcée)
 exports.createPost = async (req, res) => {
   try {
     const { title, content, category } = req.body;
@@ -61,6 +61,7 @@ exports.createPost = async (req, res) => {
         title,
         content,
         category: category || "GENERAL",
+        published: true, // 👈 CORRECTION : Assure la visibilité immédiate sur le site public
         authorId: req.user.id // Injecté par le middleware d'authentification
       }
     });
